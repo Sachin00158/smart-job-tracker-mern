@@ -1,7 +1,7 @@
-const Job = require("../models/Job");
+import Job from "../models/job.js";
 
 // CREATE JOB
-exports.createJob = async (req, res) => {
+export const createJob = async (req, res) => {
   try {
     const job = await Job.create({
       ...req.body,
@@ -15,7 +15,7 @@ exports.createJob = async (req, res) => {
 };
 
 // GET ALL JOBS
-exports.getJobs = async (req, res) => {
+export const getJobs = async (req, res) => {
   try {
     const jobs = await Job.find({ user: req.user._id });
     res.status(200).json(jobs);
@@ -24,14 +24,15 @@ exports.getJobs = async (req, res) => {
   }
 };
 
-
 // GET SINGLE JOB
-exports.getJobById = async (req, res) => {
+export const getJobById = async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);
+
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
+
     res.status(200).json(job);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -39,13 +40,13 @@ exports.getJobById = async (req, res) => {
 };
 
 // UPDATE JOB
-exports.updateJob = async (req, res) => {
+export const updateJob = async (req, res) => {
   try {
     const job = await Job.findByIdAndUpdate(
       req.params.id,
       req.body,
       {
-        returnDocument: "after",
+        new: true,
         runValidators: true
       }
     );
@@ -61,13 +62,41 @@ exports.updateJob = async (req, res) => {
 };
 
 // DELETE JOB
-exports.deleteJob = async (req, res) => {
+export const deleteJob = async (req, res) => {
   try {
     const job = await Job.findByIdAndDelete(req.params.id);
+
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
+
     res.status(200).json({ message: "Job deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// JOB STATS
+export const getJobStats = async (req, res) => {
+  try {
+    const jobs = await Job.find({ user: req.user._id });
+
+    let applied = 0;
+    let interview = 0;
+    let rejected = 0;
+
+    jobs.forEach((job) => {
+      if (job.status === "Applied") applied++;
+      if (job.status === "Interview") interview++;
+      if (job.status === "Rejected") rejected++;
+    });
+
+    res.json({
+      applied,
+      interview,
+      rejected
+    });
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
