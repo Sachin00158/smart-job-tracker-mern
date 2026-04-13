@@ -92,33 +92,71 @@ export default function ResumeMatch() {
 
           {/* RESULT */}
           {result && (
-            <div className="mt-8 bg-white p-6 rounded-xl shadow">
+  <div className="mt-8 bg-white p-6 rounded-xl shadow">
 
-              <h2 className="text-xl font-bold mb-4 text-gray-800">
-                Match Score: 
-                <span className="text-blue-600 ml-2">
-                  {result.score}%
-                </span>
-              </h2>
+    {/* SCORE */}
+    <h2 className="text-lg font-semibold mb-3 text-gray-700">
+      Match Score
+    </h2>
 
-              {/* MATCHED */}
-              <div className="mb-4">
-                <p className="text-sm text-gray-500 mb-1">Matched Skills</p>
-                <p className="text-green-600 font-medium">
-                  {result.matchedSkills?.join(", ") || "None"}
-                </p>
-              </div>
+    {/* PROGRESS BAR */}
+    <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+      <div
+        className="bg-gradient-to-r from-blue-500 to-cyan-500 h-4 transition-all duration-700"
+        style={{ width: `${result.score}%` }}
+      />
+    </div>
 
-              {/* MISSING */}
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Missing Skills</p>
-                <p className="text-red-500 font-medium">
-                  {result.missingSkills?.join(", ") || "None"}
-                </p>
-              </div>
+    <p className="mt-2 text-blue-600 font-bold">
+      {result.score}%
+    </p>
 
-            </div>
-          )}
+    {/* MATCHED SKILLS */}
+    <div className="mt-6">
+      <p className="text-sm text-gray-500 mb-2">Matched Skills</p>
+
+      <div className="flex flex-wrap gap-2">
+        {result.matchedSkills?.map((skill, i) => (
+          <span
+            key={i}
+            className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm"
+          >
+            {skill}
+          </span>
+        ))}
+      </div>
+    </div>
+
+    {/* MISSING SKILLS */}
+    <div className="mt-4">
+      <p className="text-sm text-gray-500 mb-2">Missing Skills</p>
+
+      <div className="flex flex-wrap gap-2">
+        {result.missingSkills?.map((skill, i) => (
+          <span
+            key={i}
+            className="bg-red-100 text-red-500 px-3 py-1 rounded-full text-sm"
+          >
+            {skill}
+          </span>
+        ))}
+      </div>
+    </div>
+
+    {/* SUGGESTION */}
+    {result.missingSkills?.length > 0 && (
+      <div className="mt-6 bg-yellow-50 border border-yellow-200 p-3 rounded-lg">
+        <p className="text-sm text-yellow-700">
+          💡 Improve your resume by adding:{" "}
+          <strong>{result.missingSkills.join(", ")}</strong>
+        </p>
+      </div>
+    )}
+
+  </div>
+)}
+
+
 
         </div>
 
