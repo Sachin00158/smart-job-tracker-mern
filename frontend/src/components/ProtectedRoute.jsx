@@ -8,6 +8,10 @@ export default function ProtectedRoute({ children }) {
     return <Navigate to="/login" />;
   }
 
+  if (!localStorage.getItem("token")) {
+  return <Navigate to="/login" />;
+}
+
   return children;
 
 }

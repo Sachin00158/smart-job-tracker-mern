@@ -1,43 +1,79 @@
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from "recharts";
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    ResponsiveContainer,
+    Cell,
+    CartesianGrid,
+    Tooltip
+} from "recharts";
 
 export default function JobChart({ stats }) {
 
     const data = [
-        { name: "Applied", value: stats.applied, color: "#3b82f6" },
-        { name: "Interview", value: stats.interview, color: "#22c55e" },
-        { name: "Rejected", value: stats.rejected, color: "#ef4444" }
+        { name: "Applied", value: stats.applied },
+        { name: "Interview", value: stats.interview },
+        { name: "Rejected", value: stats.rejected },
     ];
 
-    return (
-        <div className="bg-slate-800/60 backdrop-blur-md border border-slate-700 rounded-xl p-6 mt-8 max-w-3xl">
+    // ✅ Blue Theme Colors
+    const COLORS = ["#3B82F6", "#06B6D4", "#60A5FA"];
 
-            <h2 className="text-lg font-semibold mb-4">
-                Job Analytics
+    return (
+        <div className="bg-gradient-to-br from-white to-blue-50 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+
+            <h2 className="text-lg font-semibold mb-4 text-gray-700 flex items-center gap-2">
+                📊 Job Analytics
             </h2>
 
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height={250}>
 
-                <BarChart data={data} barCategoryGap="15%">
+                <BarChart data={data} barCategoryGap="20%">
 
-                    <XAxis dataKey="name" stroke="#94a3b8" />
+                    {/* GRID */}
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
 
-                    <YAxis stroke="#94a3b8" allowDecimals={false} />
+                    {/* X AXIS */}
+                    <XAxis
+                        dataKey="name"
+                        stroke="#64748b"
+                        tick={{ fontSize: 12 }}
+                    />
 
-                    <Bar dataKey="value" radius={[8, 8, 0, 0]} barSize={65}>
+                    {/* Y AXIS */}
+                    <YAxis
+                        stroke="#64748b"
+                        allowDecimals={false}
+                        tick={{ fontSize: 12 }}
+                    />
 
+                    {/* TOOLTIP */}
+                    <Tooltip
+                        cursor={{ fill: "rgba(59,130,246,0.1)" }}
+                        contentStyle={{
+                            backgroundColor: "#fff",
+                            borderRadius: "10px",
+                            border: "1px solid #e2e8f0"
+                        }}
+                    />
+
+                    {/* BAR */}
+                    <Bar
+                        dataKey="value"
+                        radius={[10, 10, 0, 0]}
+                        barSize={50}
+                        animationDuration={800}
+                    >
                         {data.map((entry, index) => (
-                            <Cell key={index} fill={entry.color} />
+                            <Cell key={index} fill={COLORS[index]} />
                         ))}
-
                     </Bar>
 
                 </BarChart>
 
             </ResponsiveContainer>
 
-
-
         </div>
-
     );
 }

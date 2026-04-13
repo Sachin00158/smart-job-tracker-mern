@@ -6,26 +6,28 @@ export default function Login() {
 
   const navigate = useNavigate();
 
-  const [email,setEmail] = useState("");
-  const [password,setPassword] = useState("");
-  const [error,setError] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
 
     e.preventDefault();
 
-    try{
+    try {
 
-      const res = await api.post("/auth/login",{
+      const res = await api.post("/auth/login", {
         email,
         password
       });
 
-      localStorage.setItem("token",res.data.token);
+      localStorage.setItem("token", res.data.token);
 
       navigate("/");
+      window.location.reload();
+      
 
-    }catch(err){
+    } catch (err) {
 
       console.error(err);
       setError("Invalid email or password");
@@ -34,7 +36,7 @@ export default function Login() {
 
   };
 
-  return(
+  return (
 
     <div className="min-h-screen flex items-center justify-center bg-slate-900">
 
@@ -51,26 +53,26 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
           <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e)=>setEmail(e.target.value)}
-          className="p-3 rounded bg-slate-700 text-white"
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="p-3 rounded bg-slate-700 text-white"
           />
 
           <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e)=>setPassword(e.target.value)}
-          className="p-3 rounded bg-slate-700 text-white"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="p-3 rounded bg-slate-700 text-white"
           />
 
           <button
-          type="submit"
-          className="bg-blue-500 py-3 rounded"
+            type="submit"
+            className="bg-blue-500 py-3 rounded"
           >
-          Login
+            Login
           </button>
 
         </form>

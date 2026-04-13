@@ -1,40 +1,41 @@
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 export default function JobPieChart({ stats }) {
 
   const data = [
-    { name: "Applied", value: stats.applied, color: "#3b82f6" },
-    { name: "Interview", value: stats.interview, color: "#22c55e" },
-    { name: "Rejected", value: stats.rejected, color: "#ef4444" }
+    { name: "Applied", value: stats.applied },
+    { name: "Interview", value: stats.interview },
+    { name: "Rejected", value: stats.rejected }
   ];
 
-  return (
-    <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-6 mt-8 max-w-3xl ">
+  const COLORS = ["#3B82F6", "#22C55E", "#EF4444"];
 
-      <h2 className="text-lg font-semibold mb-4 text-center">
-        Job Distribution
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-md w-full">
+
+      {/* Title same as bar chart */}
+      <h2 className="text-lg font-semibold mb-4 text-gray-700">
+        📊 Job Distribution
       </h2>
 
-      <ResponsiveContainer width="100%" height={220}>
-
+      <ResponsiveContainer width="100%" height={250}>
         <PieChart>
 
           <Pie
             data={data}
             dataKey="value"
-            innerRadius={60}
-            outerRadius={80}
-            paddingAngle={5}
+            innerRadius={70}
+            outerRadius={100}
+            paddingAngle={4}
           >
-
             {data.map((entry, index) => (
-              <Cell key={index} fill={entry.color} />
+              <Cell key={index} fill={COLORS[index % COLORS.length]} />
             ))}
-
           </Pie>
 
-        </PieChart>
+          <Tooltip />
 
+        </PieChart>
       </ResponsiveContainer>
 
     </div>

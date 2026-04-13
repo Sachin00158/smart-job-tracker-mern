@@ -13,9 +13,36 @@ export const matchResume = async (req, res) => {
 
     /* ================= FILE MODE ================= */
     if (req.file) {
-      const buffer = fs.readFileSync(req.file.path);
-      const data = await pdfParse(buffer);
-      resumeText = data.text;
+
+      console.log("FILE TYPE:", req.file.mimetype);
+
+      // 🔥 ONLY PDF ALLOWED
+      if (!req.file.mimetype.includes("pdf")) {
+        return res.status(400).json({
+          message: "❌ Please upload PDF only"
+        });
+      }
+
+      try {
+        const buffer = fs.readFileSync(req.file.path);
+
+        const data = await pdfParse(buffer);
+
+        if (!data.text) {
+          return res.status(400).json({
+            message: "❌ Empty or invalid PDF"
+          });
+        }
+
+        resumeText = data.text;
+
+      } catch (err) {
+        console.log("PDF PARSE ERROR:", err);
+
+        return res.status(400).json({
+          message: "❌ Failed to read PDF"
+        });
+      }
     }
 
     /* ================= TEXT MODE ================= */
@@ -24,32 +51,37 @@ export const matchResume = async (req, res) => {
     }
 
     /* ❌ VALIDATION */
-    if (!resumeText) {
-      return res.status(400).json({ message: "Resume missing" });
+    if (!resumeText || resumeText.trim() === "") {
+      return res.status(400).json({
+        message: "Resume missing"
+      });
     }
 
-    /* ================= JOB FETCH ================= */
+    /* ================= JOB ================= */
+
     let jobText = "";
 
-    // jobId case
     if (req.body.jobId) {
       const job = await Job.findById(req.body.jobId);
+
       if (!job) {
         return res.status(404).json({ message: "Job not found" });
       }
+
       jobText = job.position;
     }
 
-    // direct text case
     if (req.body.jobText) {
       jobText = req.body.jobText;
     }
 
     if (!jobText) {
-      return res.status(400).json({ message: "Job data missing" });
+      return res.status(400).json({
+        message: "Job data missing"
+      });
     }
 
-    /* ================= MATCH LOGIC ================= */
+    /* ================= MATCH ================= */
 
     const resumeWords = resumeText.toLowerCase().split(/\W+/);
     const jobWords = jobText.toLowerCase().split(/\W+/);
@@ -62,7 +94,7 @@ export const matchResume = async (req, res) => {
 
     const score = ((matched.length / uniqueJobWords.length) * 100).toFixed(1);
 
-    res.json({
+    return res.json({
       score,
       matchedSkills: matched.slice(0, 10),
       missingSkills: uniqueJobWords
@@ -71,7 +103,10 @@ export const matchResume = async (req, res) => {
     });
 
   } catch (error) {
-    console.log("AI ERROR:", error);
-    res.status(500).json({ message: error.message });
+    console.log("🔥 FINAL ERROR:", error);
+
+    return res.status(500).json({
+      message: "Server crashed"
+    });
   }
 };

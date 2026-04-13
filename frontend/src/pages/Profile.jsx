@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { FaUserCircle } from "react-icons/fa";
+import ProfileView from "./ProfileView";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
 
@@ -14,19 +15,21 @@ export default function Profile() {
     bio: ""
   });
 
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  /* FETCH */
   const fetchProfile = async () => {
     try {
       const res = await api.get("/profile");
-      if (res.data) setForm(res.data);
+      if (res.data) {
+        setProfile(res.data);
+        setForm(res.data);
+      }
     } catch {
       console.log("No profile");
     } finally {
@@ -38,94 +41,81 @@ export default function Profile() {
     fetchProfile();
   }, []);
 
-  /* SAVE */
   const handleSave = async () => {
-  try {
-    await api.post("/profile", form);
+    try {
+      const res = await api.post("/profile", form);
+      setProfile(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-    // 🔥 redirect to view page
-    navigate("/profile/view");
+  if (loading) return <div className="p-6">Loading...</div>;
 
-  } catch (err) {
-    console.error(err);
+  if (profile) {
+    return <ProfileView profile={profile} setProfile={setProfile} />;
   }
-};
-
-  if (loading) return <div className="text-white p-6">Loading...</div>;
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-6">
 
-      <div className="w-full max-w-2xl bg-slate-800/60 backdrop-blur-md border border-slate-700 rounded-2xl p-8 shadow-xl">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8">
 
         {/* HEADER */}
         <div className="flex items-center gap-4 mb-6">
-          <FaUserCircle size={50} className="text-indigo-400" />
+          <FaUserCircle size={45} className="text-blue-600" />
           <div>
-            <h2 className="text-2xl font-bold">My Profile</h2>
-            <p className="text-gray-400 text-sm">Manage your details</p>
+            <h2 className="text-2xl font-bold text-gray-800">My Profile</h2>
+            <p className="text-gray-500 text-sm">Manage your details</p>
           </div>
         </div>
 
         {/* FORM */}
         <div className="grid gap-4">
 
-          <input
-            name="name"
-            value={form.name}
-            onChange={handleChange}
+          <input name="name" value={form.name} onChange={handleChange}
             placeholder="Name"
-            className="p-3 rounded-lg bg-slate-700 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
+            className="p-3 rounded-lg border focus:ring-2 focus:ring-blue-400 outline-none" />
 
-          <input
-            name="email"
-            value={form.email}
-            onChange={handleChange}
+          <input name="email" value={form.email} onChange={handleChange}
             placeholder="Email"
-            className="p-3 rounded-lg bg-slate-700 border border-slate-600"
-          />
+            className="p-3 rounded-lg border focus:ring-2 focus:ring-blue-400 outline-none" />
 
-          <input
-            name="skills"
-            value={form.skills}
-            onChange={handleChange}
-            placeholder="Skills (React, Node...)"
-            className="p-3 rounded-lg bg-slate-700 border border-slate-600"
-          />
+          <input name="skills" value={form.skills} onChange={handleChange}
+            placeholder="Skills"
+            className="p-3 rounded-lg border focus:ring-2 focus:ring-blue-400 outline-none" />
 
-          <input
-            name="experience"
-            value={form.experience}
-            onChange={handleChange}
-            placeholder="Experience (0-1 years)"
-            className="p-3 rounded-lg bg-slate-700 border border-slate-600"
-          />
+          <input name="experience" value={form.experience} onChange={handleChange}
+            placeholder="Experience"
+            className="p-3 rounded-lg border focus:ring-2 focus:ring-blue-400 outline-none" />
 
-          <input
-            name="role"
-            value={form.role}
-            onChange={handleChange}
+          <input name="role" value={form.role} onChange={handleChange}
             placeholder="Preferred Role"
-            className="p-3 rounded-lg bg-slate-700 border border-slate-600"
-          />
+            className="p-3 rounded-lg border focus:ring-2 focus:ring-blue-400 outline-none" />
 
-          <textarea
-            name="bio"
-            value={form.bio}
-            onChange={handleChange}
-            placeholder="About You"
+          <textarea name="bio" value={form.bio} onChange={handleChange}
             rows="3"
-            className="p-3 rounded-lg bg-slate-700 border border-slate-600"
-          />
+            placeholder="Bio"
+            className="p-3 rounded-lg border focus:ring-2 focus:ring-blue-400 outline-none" />
 
-          {/* BUTTON */}
-          <button
-            onClick={handleSave}
-            className="mt-4 bg-indigo-500 hover:bg-indigo-600 transition py-3 rounded-lg font-semibold shadow-md"
-          >
-            Save Profile
-          </button>
+          {/* BUTTONS */}
+          <div className="flex justify-between mt-4">
+
+            <button
+              onClick={() => navigate("/")}
+              className="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300"
+            >
+              ← Back
+            </button>
+
+            <button
+              onClick={handleSave}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+            >
+              Save Profile
+            </button>
+
+          </div>
 
         </div>
 
