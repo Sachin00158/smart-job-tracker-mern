@@ -16,7 +16,6 @@ export const matchResume = async (req, res) => {
 
       console.log("FILE TYPE:", req.file.mimetype);
 
-      // 🔥 ONLY PDF ALLOWED
       if (!req.file.mimetype.includes("pdf")) {
         return res.status(400).json({
           message: "❌ Please upload PDF only"
@@ -25,7 +24,6 @@ export const matchResume = async (req, res) => {
 
       try {
         const buffer = fs.readFileSync(req.file.path);
-
         const data = await pdfParse(buffer);
 
         if (!data.text) {
@@ -50,7 +48,6 @@ export const matchResume = async (req, res) => {
       resumeText = req.body.resumeText;
     }
 
-    /* ❌ VALIDATION */
     if (!resumeText || resumeText.trim() === "") {
       return res.status(400).json({
         message: "Resume missing"
@@ -94,12 +91,36 @@ export const matchResume = async (req, res) => {
 
     const score = ((matched.length / uniqueJobWords.length) * 100).toFixed(1);
 
+    const missing = uniqueJobWords
+      .filter(word => !resumeWords.includes(word));
+
+    /* ================= 🔥 AI SUGGESTIONS (NEW) ================= */
+
+    const suggestions = [];
+
+    if (missing.length > 0) {
+      suggestions.push(`Add keywords like ${missing.slice(0, 5).join(", ")}`);
+    }
+
+    if (score < 50) {
+      suggestions.push("Improve resume by adding relevant projects");
+    }
+
+    if (score < 70) {
+      suggestions.push("Use more job-specific keywords");
+    }
+
+    if (matched.length < 5) {
+      suggestions.push("Highlight more technical skills in your resume");
+    }
+
+    /* ================= RESPONSE ================= */
+
     return res.json({
       score,
       matchedSkills: matched.slice(0, 10),
-      missingSkills: uniqueJobWords
-        .filter(word => !resumeWords.includes(word))
-        .slice(0, 10)
+      missingSkills: missing.slice(0, 10),
+      suggestions // 🔥 NEW FIELD
     });
 
   } catch (error) {

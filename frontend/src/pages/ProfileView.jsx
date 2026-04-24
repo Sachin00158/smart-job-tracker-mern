@@ -57,17 +57,24 @@ export default function ProfileView({ profile, setProfile }) {
 
           <div className="bg-gray-50 p-4 rounded-xl hover:shadow transition">
             <p className="text-xs text-gray-500">Email</p>
-            <p className="font-semibold text-gray-800 mt-1">
-              {profile.email}
-            </p>
+
+<p className="font-semibold text-gray-800 mt-1">
+  {profile.email}
+</p>
           </div>
 
-          <div className="bg-gray-50 p-4 rounded-xl hover:shadow transition">
-            <p className="text-xs text-gray-500">Skills</p>
-            <p className="font-semibold text-gray-800 mt-1">
-              {profile.skills}
-            </p>
-          </div>
+         <p className="text-xs text-gray-500">Skills</p>
+
+<div className="flex flex-wrap gap-2 mt-2">
+  {profile.skills?.split(",").map((skill, i) => (
+    <span
+      key={i}
+      className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium"
+    >
+      {skill.trim()}
+    </span>
+  ))}
+</div>
 
           <div className="bg-gray-50 p-4 rounded-xl hover:shadow transition">
             <p className="text-xs text-gray-500">Experience</p>
