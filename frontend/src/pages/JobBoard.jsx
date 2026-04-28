@@ -70,6 +70,33 @@ export default function JobBoard() {
               <p className="text-sm text-gray-500">
                 {job.position}
               </p>
+
+              {/* 🔥 MOBILE SUPPORT BUTTONS */}
+              <div className="flex gap-2 mt-3 md:hidden">
+
+                <button
+                  onClick={() => updateStatus(job._id, "Applied")}
+                  className="text-xs bg-blue-500 text-white px-2 py-1 rounded"
+                >
+                  A
+                </button>
+
+                <button
+                  onClick={() => updateStatus(job._id, "Interview")}
+                  className="text-xs bg-green-500 text-white px-2 py-1 rounded"
+                >
+                  I
+                </button>
+
+                <button
+                  onClick={() => updateStatus(job._id, "Rejected")}
+                  className="text-xs bg-red-500 text-white px-2 py-1 rounded"
+                >
+                  R
+                </button>
+
+              </div>
+
             </div>
           ))}
 
