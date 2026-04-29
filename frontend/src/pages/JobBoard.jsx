@@ -8,6 +8,9 @@ export default function JobBoard() {
   const [jobs, setJobs] = useState([]);
   const navigate = useNavigate();
 
+  // 🔥 touch state
+  const [draggedId, setDraggedId] = useState(null);
+
   const fetchJobs = async () => {
     const res = await api.get("/jobs");
     return res.data;
@@ -32,6 +35,8 @@ export default function JobBoard() {
     setJobs(data);
   };
 
+  // ================= PC DRAG =================
+
   const onDrop = (e, status) => {
     const id = e.dataTransfer.getData("id");
     updateStatus(id, status);
@@ -43,10 +48,24 @@ export default function JobBoard() {
     e.dataTransfer.setData("id", id);
   };
 
+  // ================= MOBILE TOUCH =================
+
+  const handleTouchStart = (id) => {
+    setDraggedId(id);
+  };
+
+  const handleTouchEnd = (status) => {
+    if (draggedId) {
+      updateStatus(draggedId, status);
+      setDraggedId(null);
+    }
+  };
+
   const renderColumn = (status, color) => (
     <div
       onDrop={(e) => onDrop(e, status)}
       onDragOver={allowDrop}
+      onTouchEnd={() => handleTouchEnd(status)}   // 🔥 mobile drop
       className="bg-white p-4 rounded-xl shadow min-h-[350px] flex flex-col"
     >
       <h2 className={`mb-4 font-semibold text-lg ${color}`}>
@@ -62,6 +81,10 @@ export default function JobBoard() {
               key={job._id}
               draggable
               onDragStart={(e) => onDragStart(e, job._id)}
+
+              // 🔥 mobile drag start
+              onTouchStart={() => handleTouchStart(job._id)}
+
               className="bg-gray-100 p-3 rounded-lg cursor-grab hover:bg-blue-50 transition shadow-sm"
             >
               <p className="font-semibold text-gray-800">
@@ -70,33 +93,6 @@ export default function JobBoard() {
               <p className="text-sm text-gray-500">
                 {job.position}
               </p>
-
-              {/* 🔥 MOBILE SUPPORT BUTTONS */}
-              <div className="flex gap-2 mt-3 md:hidden">
-
-                <button
-                  onClick={() => updateStatus(job._id, "Applied")}
-                  className="text-xs bg-blue-500 text-white px-2 py-1 rounded"
-                >
-                  A
-                </button>
-
-                <button
-                  onClick={() => updateStatus(job._id, "Interview")}
-                  className="text-xs bg-green-500 text-white px-2 py-1 rounded"
-                >
-                  I
-                </button>
-
-                <button
-                  onClick={() => updateStatus(job._id, "Rejected")}
-                  className="text-xs bg-red-500 text-white px-2 py-1 rounded"
-                >
-                  R
-                </button>
-
-              </div>
-
             </div>
           ))}
 
@@ -113,7 +109,6 @@ export default function JobBoard() {
 
         <div className="max-w-7xl mx-auto">
 
-          {/* BACK BUTTON */}
           <button
             onClick={() => navigate("/")}
             className="text-blue-600 mb-4 hover:underline"
@@ -121,7 +116,6 @@ export default function JobBoard() {
             ← Back to Dashboard
           </button>
 
-          {/* HEADER */}
           <div className="bg-gradient-to-r from-blue-600 to-cyan-500 px-6 py-5 rounded-xl shadow-md mb-8">
             <h1 className="text-2xl md:text-3xl font-bold text-white">
               📌 Job Board
@@ -131,13 +125,10 @@ export default function JobBoard() {
             </p>
           </div>
 
-          {/* BOARD */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
             {renderColumn("Applied", "font-bold text-blue-600")}
             {renderColumn("Interview", "font-bold text-green-600")}
             {renderColumn("Rejected", "font-bold text-red-600")}
-
           </div>
 
         </div>
